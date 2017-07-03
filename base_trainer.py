@@ -13,6 +13,7 @@ class BaseTrainer:
   validation_percentage = 0.99
   img_rows = 28
   img_cols = 28
+  img_channels = 1
 
   def __init__(self):
     # set up commandline arguments
@@ -24,7 +25,7 @@ class BaseTrainer:
   def run(self):
     self.load_args()
     shaped_values, shaped_labels = self.load_training_data()
-    testing_values = self.load_testing_data()
+    testing_values, testing_labels = self.load_testing_data()
     training_values, validation_values = self.split_data(shaped_values)
     training_labels, validation_labels = self.split_data(shaped_labels)
 
@@ -32,23 +33,24 @@ class BaseTrainer:
     print(training_values.shape[0], 'training samples')
     print(validation_values.shape[0], 'validation samples')
 
-    model = self.build_model(input_shape=training_values.shape[1:])
+    self.build_model(input_shape=training_values.shape[1:])
 
     # training
-    model.fit(training_values, training_labels,
+    self.model.fit(training_values, training_labels,
               batch_size=self.batch_size,
               epochs=self.epochs,
               verbose=1,
               validation_data=(validation_values, validation_labels))
 
-    # testing
-    predictions = model.predict(testing_values)
+    self.test_results(testing_values, testing_labels)
+
+  def test_results(self, testing_values, testing_labels):
+    predictions = self.model.predict(testing_values)
     df = pandas.DataFrame(data=np.argmax(predictions, axis=1), columns=['Label'])
     df.insert(0, 'ImageId', range(1, 1 + len(df)))
 
     # save results
     df.to_csv(self.commandline_args.output, index=False)
-
 
   def load_args(self):
     self.commandline_args = self.parser.parse_args()
@@ -71,16 +73,17 @@ class BaseTrainer:
     scaled_values = self.scale_values(values)
     shaped_values = self.reshape_values(scaled_values)
 
-    return shaped_values
+    return shaped_values, None
 
   def scale_values(self, values):
     return values.astype('float32') / 255
 
   def reshape_values(self, values):
+    # TODO make it work when data comes pre-shaped
     if K.image_data_format() == 'channels_first':
-        reshaped_values = values.reshape(values.shape[0], 1, self.img_rows, self.img_cols)
+        reshaped_values = values.reshape(values.shape[0], self.img_channels, self.img_rows, self.img_cols)
     else:
-        reshaped_values = values.reshape(values.shape[0], self.img_rows, self.img_cols, 1)
+        reshaped_values = values.reshape(values.shape[0], self.img_rows, self.img_cols, self.img_channels)
 
     return reshaped_values
 

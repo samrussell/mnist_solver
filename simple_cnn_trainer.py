@@ -22,7 +22,7 @@ class SimpleCnnTrainer(base_trainer.BaseTrainer):
                   optimizer=keras.optimizers.Adadelta(),
                   metrics=['accuracy'])
 
-    return model
+    self.model = model
 
 if __name__ == "__main__":
   SimpleCnnTrainer().run()
