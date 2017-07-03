@@ -5,9 +5,6 @@ import keras
 from keras import backend as K
 from keras.utils import to_categorical
 from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
 
 class BaseTrainer:
   batch_size = 128
@@ -35,21 +32,8 @@ class BaseTrainer:
     print(training_values.shape[0], 'training samples')
     print(validation_values.shape[0], 'validation samples')
 
-    model = Sequential()
-    model.add(Conv2D(32, kernel_size=(3, 3),
-                     activation='relu',
-                     input_shape=training_values.shape[1:]))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
-    model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(self.num_classes, activation='softmax'))
+    model = self.build_model(input_shape=training_values.shape[1:])
 
-    model.compile(loss=keras.losses.categorical_crossentropy,
-                  optimizer=keras.optimizers.Adadelta(),
-                  metrics=['accuracy'])
     # training
     model.fit(training_values, training_labels,
               batch_size=self.batch_size,
