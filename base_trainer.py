@@ -87,3 +87,6 @@ class BaseTrainer:
   def split_data(self, data):
     landmark = int(data.shape[0] * self.validation_percentage)
     return data[:landmark], data[landmark:]
+
+  def build_model(self, input_shape):
+    raise NotImplementedError("Must be implemented by subclass")
