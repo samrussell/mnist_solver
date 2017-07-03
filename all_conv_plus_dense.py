@@ -6,8 +6,8 @@ Gets to 99.25% test accuracy after 12 epochs
 '''
 # based on https://github.com/fchollet/keras/blob/master/examples/mnist_cnn.py
 # extended to https://arxiv.org/pdf/1412.6806.pdf "STRIVING FOR SIMPLICITY: THE ALL CONVOLUTIONAL NET"
+# then modified to add 2x dense layers at the end
 
-from __future__ import print_function
 import keras
 from keras.datasets import mnist
 from keras.models import Sequential
