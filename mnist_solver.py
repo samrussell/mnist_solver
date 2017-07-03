@@ -46,9 +46,11 @@ validation_values /= 255
 if K.image_data_format() == 'channels_first':
     # this might learn them sideways... not that it matters
     values = values.reshape(values.shape[0], 1, img_rows, img_cols)
+    validation_values = validation_values.reshape(validation_values.shape[0], 1, img_rows, img_cols)
     input_shape = (1, img_rows, img_cols)
 else:
     values = values.reshape(values.shape[0], img_rows, img_cols, 1)
+    validation_values = validation_values.reshape(validation_values.shape[0], img_rows, img_cols, 1)
     input_shape = (img_rows, img_cols, 1)
 
 # keep 1% as validation
